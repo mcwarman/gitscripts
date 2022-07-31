@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+repository=$1
+test -z "$repository" && echo "ERROR: Please provide the repository url." 1>&2 && exit 1
+directory=$1
+directory=${directory%%.git}
+directory=${directory##git@}
+directory=${directory/:/\/}
+directory=${directory,,}
+cd "$HOME/code/src"
+git clone "$repository" "$directory"

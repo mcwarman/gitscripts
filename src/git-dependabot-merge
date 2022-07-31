@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -eu
+
+remote="origin"
+
+default_branch=$(git remote show "${remote}" | grep 'HEAD branch' | cut -d' ' -f5)
+
+git fetch "$remote"
+git remote prune "$remote"
+
+git branch -f dependabot-merge "${default_branch}"
+
+git for-each-ref --shell --format="ref=%(refname)" refs/remotes/origin/dependabot | \
+while read -r entry
+do
+  eval "${entry}"
+  ref="${ref:?}"
+  branch="${ref#refs/remotes/origin/}"
+  echo "Working on ${branch}"
+  git checkout "${branch}"
+  git rebase dependabot-merge
+  git checkout dependabot-merge
+  git merge --ff-only "${branch}"
+done

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  printf 'usage: git gone [-pndD] [-r <remote>]
+OPTIONS
+  -p  prune remote branch
+  -n  dry run: list the gone branches
+  -d  delete the gone branches
+  -D  delete the gone branches forcefully
+  -r  Set the remote to check [default: origin]
+
+EXAMPLES
+git gone -pn	prune and dry run
+git gone -d	delete the gone branches
+
+'
+}
+
+help=false
+prune=false
+list=false
+delete=false
+force=false
+
+remote="origin"
+
+while getopts :r:pndDh flag
+do
+  case "${flag}" in
+    r) remote=${OPTARG};;
+    p) prune=true;;
+    n) list=true;;
+    d) delete=true;;
+    D)
+      delete=true
+      force=true
+    ;;
+    h) help=true;;
+    *)
+  esac
+done
+
+gone="${remote}/.*: gone]"
+
+if [ "$help" = true ]; then
+  usage
+  exit 1
+fi
+
+if [ "$prune" = true ]; then
+  git fetch "$remote"
+  git remote prune "$remote"
+fi
+
+if [ "$delete" = true ] ; then
+  if [ "$force" = true ] ; then
+    git branch -vv | grep "$gone" | awk '{print $1}' | xargs -r git branch -D
+  else
+    git branch -vv | grep "$gone" | awk '{print $1}' | xargs -r git branch -d
+  fi
+elif [ "$list" = true ] ; then
+  git branch -vv | grep "$gone"
+fi
