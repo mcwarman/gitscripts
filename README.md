@@ -21,7 +21,13 @@ cd ~/code/src/github.com/mcwarman/gitscripts
 
 ### `dependabot-merge`
 
-Creates a branch `dependabot-merge`, then attempts to rebase and merge all branches `origin/dependabot/...` into it.
+Creates a branch `dependabot-merge`, then attempts to rebase and merge all branches `origin/dependabot/...` into it. If origin isn't your remote, then you can specify that using `-r`.
+
+```shell
+$ git dependabot-merge -r github
+Working on dependabot/github_actions/pascalgn/automerge-action-0.15.5
+Switched to a new branch 'dependabot/github_actions/pascalgn/automerge-action-0.15.5'
+```
 
 ### `gone`
 
