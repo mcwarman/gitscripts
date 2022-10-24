@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -eu
+
+GIT_BRANCH=$(git symbolic-ref --short HEAD)
+
+echo Assuming branch=$GIT_BRANCH
+for i in $(git remote)
+do
+ echo "-------[$i] git pull"
+ git pull $i $GIT_BRANCH
+done
+for i in $(git remote)
+do
+  echo "-------[$i] git push"
+  git push $i $GIT_BRANCH
+done
+

@@ -40,3 +40,7 @@ Switch and update default branch, also runs `git gone -pD`.
 ### `whoami`
 
 Returns configured `user.name` and `user.email`.
+
+### `sync`
+
+If you have have multiple remotes and you want to keep them all in sync (e.g. you might have the same project checked into github + gitlab + bitbucket...). Assumes your locally checked out branch is the one you want to sync.
