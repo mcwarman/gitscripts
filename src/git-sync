@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 set -eu
 
-GIT_BRANCH=$(git symbolic-ref --short HEAD)
+git_branch=$(git symbolic-ref --short HEAD)
 
-echo Assuming branch=$GIT_BRANCH
+echo Assuming branch="${git_branch}"
 for i in $(git remote)
 do
  echo "-------[$i] git pull"
- git pull $i $GIT_BRANCH
+ git pull "${i}" "${git_branch}"
 done
 for i in $(git remote)
 do
   echo "-------[$i] git push"
-  git push $i $GIT_BRANCH
+  git push "${i}" "${git_branch}"
 done
 

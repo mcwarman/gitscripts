@@ -4,6 +4,7 @@ set -eu
 usage() {
   printf 'usage: git dependabot-merge [-r <remote>]
 OPTIONS
+  -f  Set the additional filter (example: github_actions) [default: ""]
   -r  Set the remote to check [default: origin]
 
 EXAMPLES
@@ -12,12 +13,14 @@ git dependabot-merge
 '
 }
 
+filter=""
 remote="origin"
 help=false
 
-while getopts :r:h flag
+while getopts :r:f:h flag
 do
   case "${flag}" in
+    f) filter=${OPTARG};;
     r) remote=${OPTARG};;
     h) help=true;;
     *)
@@ -35,12 +38,12 @@ git fetch "$remote"
 git remote prune "$remote"
 git branch -f dependabot-merge "${default_branch}"
 
-git for-each-ref --shell --format="ref=%(refname)" refs/remotes/$remote/dependabot | \
+git for-each-ref --shell --format="ref=%(refname)" "refs/remotes/${remote}/dependabot/${filter}" | \
 while read -r entry
 do
   eval "${entry}"
   ref="${ref:?}"
-  branch="${ref#refs/remotes/$remote/}"
+  branch="${ref#refs/remotes/"${remote}"/}"
   echo "Working on ${branch}"
   git checkout "${branch}"
   git rebase dependabot-merge
