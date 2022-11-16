@@ -6,6 +6,7 @@ usage() {
 OPTIONS
   -f  Set the additional filter (example: github_actions) [default: ""]
   -r  Set the remote to check [default: origin]
+  -a  rebase back onto the main branch  (if possible)
 
 EXAMPLES
 git dependabot-merge -r github
@@ -16,13 +17,16 @@ git dependabot-merge
 filter=""
 remote="origin"
 help=false
+autoRebase=false
+targetBranch="dependabot-merge"
 
-while getopts :r:f:h flag
+while getopts :r:f:h:a flag
 do
   case "${flag}" in
     f) filter=${OPTARG};;
     r) remote=${OPTARG};;
     h) help=true;;
+    a) autoRebase=true;;
     *)
   esac
 done
@@ -36,7 +40,7 @@ default_branch=$(git remote show "${remote}" | grep 'HEAD branch' | cut -d' ' -f
 
 git fetch "$remote"
 git remote prune "$remote"
-git branch -f dependabot-merge "${default_branch}"
+git branch -f "$targetBranch" "${default_branch}"
 
 git for-each-ref --shell --format="ref=%(refname)" "refs/remotes/${remote}/dependabot/${filter}" | \
 while read -r entry
@@ -46,7 +50,13 @@ do
   branch="${ref#refs/remotes/"${remote}"/}"
   echo "Working on ${branch}"
   git checkout "${branch}"
-  git rebase dependabot-merge
-  git checkout dependabot-merge
+  git rebase "$targetBranch"
+  git checkout "$targetBranch"
   git merge --ff-only "${branch}"
 done
+
+if [ "$autoRebase" = true ]; then
+  git checkout "${default_branch}"
+  git rebase "$targetBranch"
+  git branch -d "$targetBranch"
+fi
