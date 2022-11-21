@@ -20,7 +20,7 @@ help=false
 autoRebase=false
 targetBranch="dependabot-merge"
 
-while getopts :r:f:h:a flag
+while getopts :r:f:ha flag
 do
   case "${flag}" in
     f) filter=${OPTARG};;
